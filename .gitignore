@@ -1,0 +1,6 @@
+cmake-build-debug/**
+misc.md
+.hg/**
+.idea
+.idea/**
+*.iml
