@@ -10,7 +10,8 @@ int TOTAL_SENSORS = 1; // how much hall sensors we have //:todo add to menu defi
 
 DisplayOled displayOled;
 
-Odometer odo(TOTAL_SENSORS, 64); // 64 cm, bike
+Odometer odo(TOTAL_SENSORS);
+
 
 Storage store;
 
@@ -21,10 +22,14 @@ void setup() {
     pinMode(PIN_BTN_CENTER, INPUT_PULLUP); // button
     pinMode(PIN_HALL_SENSOR, INPUT);  // define the Hall magnetic sensor line as input
 
-    attachInterrupt(0, onHall, FALLING);
+    if (isTestMode) {
+        odo.setCircleLen(10000); // 10 meters, for tests
+    } else {
+        attachInterrupt(0, onHall, FALLING);
+        odo.setDiam(640); // 64 cm as default
+    }
     Serial.begin(9600);
 
-    odo.setCircleLen(10000); // 10 meters
 
     Serial.println("App started! ver = " + odo.ver());
     store.init();
@@ -44,7 +49,6 @@ void loop() {
 
 void onHall() {
     odo.turnInc();
-
     if (odo.isCalc) {
         odo.calcDist();
         odo.calcRpm();

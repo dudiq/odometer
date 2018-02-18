@@ -67,6 +67,8 @@ public:
             odo.turnDec();
         } else if (btn == ItemMenuBase::btnCenter) {
             // :todo set value to
+            long curr = (1000L * ONE_METER) / odo.turnCount;
+            odo.setCircleLen(curr);
         }
     }
 

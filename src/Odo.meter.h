@@ -12,10 +12,12 @@ private:
     volatile unsigned long timeDXTmp = 0;
 
     // distance counters, need to save this values
-    long distances[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    unsigned long distances[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    volatile unsigned long checkLen = 0;
 
 public:
-    Odometer(int sens, int dim);
+    Odometer(int sens);
 
     volatile boolean isCalc = true;
     volatile unsigned long timeDX = 0;
@@ -58,8 +60,16 @@ public:
         this->distances[0] += this->circleLen;
         if (this->distances[0] > DIST_MAX_COUNT_LOCALE) {
             //increment counters and drop incrementer
+            this->checkLen = this->distances[1];
             for (int i = 1; i < 10; i++) {
                 this->distances[i]++;
+            }
+
+            if (this->checkLen > this->distances[1]) {
+                unsigned long stopTime = millis();
+                Serial.println("stopTime = " + String(stopTime));
+                Serial.println("this->checkLen = " + String(this->checkLen));
+                Serial.println("this->distances[1] = " + String(this->distances[1]));
             }
 
             this->distances[0] -= DIST_MAX_COUNT_LOCALE;
@@ -119,9 +129,7 @@ public:
 
 };
 
-Odometer::Odometer(int val, int diam) {
+Odometer::Odometer(int val) {
     sensors = val;
     rpmTimeProcess = (60 / val) * 1000000; // using micro seconds (rotations per minute)
-    circleDiameter = ONE_CENTIMETER * diam;
-    circleLen = round(PI * circleDiameter);
 }
