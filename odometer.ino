@@ -23,7 +23,7 @@ void setup() {
     pinMode(PIN_HALL_SENSOR, INPUT);  // define the Hall magnetic sensor line as input
 
     if (isTestMode) {
-        odo.setCircleLen(10000); // 10 meters, for tests
+        odo.setCircleLen(10000L); // 10 meters, for tests
     } else {
         attachInterrupt(0, onHall, FALLING);
         odo.setDiam(640); // 64 cm as default

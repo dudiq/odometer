@@ -15,7 +15,7 @@ public:
 
         int seconds = round(displayOled.drawLastTime / 1000);
         displayOled.drawLeftTopTitle("t=" + String(seconds));
-        displayOled.drawLeftCenterTitle("rpm=" + String(odo.rpmVal));
+        displayOled.drawLeftCenterTitle("fps=" + String(round(displayOled.fps)));
         displayOled.drawLeftBottomTitle("spd=" + String(odo.speedVal));
     }
 
@@ -116,7 +116,7 @@ public:
 
 class ItemSetLength : public ItemMenuBase {
 private:
-    int curr = 0;
+    unsigned long curr = 0;
 public:
 
     virtual void onInit() {

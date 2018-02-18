@@ -13,7 +13,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 
 class DisplayOled {
     volatile int FONT_SIZE = 6;
-    volatile int drawEveryThMs = 200; // 0.5s
+    volatile int drawEveryThMs = 200; // in ms
     volatile unsigned long drawPrevTime = 0;
     volatile unsigned long drawTimeDx = 0;
 
@@ -59,6 +59,7 @@ private:
 
 public:
     volatile unsigned long drawLastTime = 0;
+    volatile float fps = 0;
 
     void setupDisplay(String ver) {
         display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x32)
@@ -86,6 +87,8 @@ public:
             display.setTextColor(WHITE);
 
             this->drawCb();
+
+            this->fps = 1000 / this->drawTimeDx;
 
             display.display();
             this->drawPrevTime = this->drawLastTime;
