@@ -49,15 +49,6 @@ private:
         display.setCursor(x, y);
         display.setTextSize(size);
         display.println(text);
-//        int len = text.length() + 1;
-//        int dx = this->FONT_SIZE * size;
-//        char copy[len];
-//        text.toCharArray(copy, len);
-//        for (int i = 0; i < len; i++) {
-//            char ch = copy[i];
-//            display.drawChar(x, y, ch, 1, 0, size);
-//            x = x + dx;
-//        }
     }
 
 public:
@@ -87,7 +78,16 @@ public:
 
         if (this->drawTimeDx > this->drawEveryThMs) {
             display.clearDisplay();
-            display.setTextColor(WHITE);
+//            display.setTextColor(WHITE);
+
+//            display.setFont(&FreeMono9pt7b);
+//            this->drawLeftTopTitle("0123");
+//            display.setFont(&FreeMonoBold9pt7b);
+//            this->drawLeftCenterTitle("0123");
+//            display.setFont(&Picopixel);
+//            this->drawLeftbottomTitle("0123");
+//            display.setFont(&Tiny3x3a2pt7b);
+//            this->drawTextAlignLeft("0123", 0, 0, 1);
 
             this->drawCb();
 
@@ -100,19 +100,21 @@ public:
 
     // right places
     void drawIntMain(String val) {
-        this->drawTextAlignRight(val, 120, 6, 2, false);
+        this->drawTextAlignRight(val, 128, 0, 2, false);
     }
 
     void drawIntSecond(String val) {
-        this->drawTextAlignRight(val, 118, 24, 1, false);
+        this->drawTextAlignRight(val, 128, 20, 1, false);
     }
 
     void drawDistanceMain(String val) {
-        this->drawTextAlignRight(val, 120, 6, 2, true);
+//        display.setFont(&FreeMonoBold9pt7b);
+        this->drawTextAlignRight(val, 128, 0, 2, true);
     }
 
     void drawDistanceSecond(String val) {
-        this->drawTextAlignRight(val, 118, 24, 1, true);
+  //      display.setFont(&FreeMono9pt7b);
+        this->drawTextAlignRight(val, 128, 17, 2, true);
     }
 
 // left places
