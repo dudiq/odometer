@@ -46,15 +46,18 @@ private:
     }
 
     void drawTextAlignLeft(String text, int x, int y, int size) {
-        int len = text.length() + 1;
-        int dx = this->FONT_SIZE * size;
-        char copy[len];
-        text.toCharArray(copy, len);
-        for (int i = 0; i < len; i++) {
-            char ch = copy[i];
-            display.drawChar(x, y, ch, 1, 0, size);
-            x = x + dx;
-        }
+        display.setCursor(x, y);
+        display.setTextSize(size);
+        display.println(text);
+//        int len = text.length() + 1;
+//        int dx = this->FONT_SIZE * size;
+//        char copy[len];
+//        text.toCharArray(copy, len);
+//        for (int i = 0; i < len; i++) {
+//            char ch = copy[i];
+//            display.drawChar(x, y, ch, 1, 0, size);
+//            x = x + dx;
+//        }
     }
 
 public:
@@ -70,7 +73,7 @@ public:
         display.setCursor(5, 5);
         display.println(ver);
         display.display();
-//        delay(1000);
+        delay(1000);
     }
 
     void onDraw( void(*func)(void)) {

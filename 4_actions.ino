@@ -22,10 +22,10 @@ public:
     virtual void onKeyUp(int &btn) {
         if (btn == ItemMenuBase::btnUp) {
             // inc common dist
-            odo.setDist(distInc(odo.getDist(2), this->dxDistance), 2);
+            odo.setDist(2, distInc(odo.getDist(2), this->dxDistance));
         } else if (btn == ItemMenuBase::btnDown) {
             // decrement common dist
-            odo.setDist(distDec(odo.getDist(2), this->dxDistance), 2);
+            odo.setDist(2, distDec(odo.getDist(2), this->dxDistance));
         } else if (btn == ItemMenuBase::btnCenter) {
             // drop local distance
             odo.setDist(1, 0);
@@ -34,9 +34,9 @@ public:
 
     virtual void onKeyHold(int &btn) {
         if (btn == ItemMenuBase::btnUp) {
-            odo.setDist(distInc(odo.getDist(2), this->hardDxDist), 2);
+            odo.setDist(2, distInc(odo.getDist(2), this->hardDxDist));
         } else if (btn == ItemMenuBase::btnDown) {
-            odo.setDist(distDec(odo.getDist(2), this->hardDxDist), 2);
+            odo.setDist(2, distDec(odo.getDist(2), this->hardDxDist));
         }
     }
 
@@ -59,17 +59,25 @@ public:
         displayOled.drawLeftBottomTitle("One km");
         displayOled.drawIntMain(String(odo.turnCount));
     }
-
-    virtual void onKeyUp(int &btn) {
+    
+    void turnBy(int &btn) {
         if (btn == ItemMenuBase::btnUp) {
             odo.turnInc();
         } else if (btn == ItemMenuBase::btnDown) {
             odo.turnDec();
-        } else if (btn == ItemMenuBase::btnCenter) {
-            // :todo set value to
+        }
+    }
+
+    virtual void onKeyUp(int &btn) {
+        this->turnBy(btn);
+        if (btn == ItemMenuBase::btnCenter) {
             long curr = (1000L * ONE_METER) / odo.turnCount;
             odo.setCircleLen(curr);
         }
+    }
+
+    virtual void onKeyHold(int &btn) {
+        this->turnBy(btn);
     }
 
 };

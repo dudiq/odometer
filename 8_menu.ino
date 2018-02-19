@@ -11,10 +11,8 @@ ItemMenuBase *menu[] = {
 
 int menuItemPos = 0;
 
-void processBtnClick() {
-    ItemMenuBase *currItem = menu[menuItemPos];
-    // todo add timer for return to zero menu item after 20 secs if it not in oneKilometer
-    menuOdo.onItemMenu(currItem);
+void onItemMenu() {
+    menuOdo.onItemMenu(menu[menuItemPos]);
 }
 
 void processNavi() {

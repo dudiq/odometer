@@ -12,22 +12,16 @@ DisplayOled displayOled;
 
 Odometer odo(TOTAL_SENSORS);
 
-
 Storage store;
-
-boolean isTestMode = true;
 
 void setup() {
 
     pinMode(PIN_BTN_CENTER, INPUT_PULLUP); // button
     pinMode(PIN_HALL_SENSOR, INPUT);  // define the Hall magnetic sensor line as input
 
-    if (isTestMode) {
-        odo.setCircleLen(10000L); // 10 meters, for tests
-    } else {
-        attachInterrupt(0, onHall, FALLING);
-        odo.setDiam(640); // 64 cm as default
-    }
+    attachInterrupt(0, onHall, FALLING);
+    odo.setDiam(640); // 64 cm as default
+
     Serial.begin(9600);
 
 
@@ -38,16 +32,13 @@ void setup() {
 }
 
 void loop() {
-    if (isTestMode) {
-        odo.calcTimeDiff();
-        onHall();
-        processBtnClick();
-        displayOled.drawScreen();
-        delay(100);
-    }
+    onItemMenu();
+    displayOled.drawScreen();
+    delay(50);
 }
 
 void onHall() {
+    odo.calcTimeDiff();
     odo.turnInc();
     if (odo.isCalc) {
         odo.calcDist();
