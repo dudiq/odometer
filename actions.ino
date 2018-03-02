@@ -9,9 +9,6 @@ public:
         displayOled.drawDistanceSecond(String(odo.getDist(2)));
 
         // left elements
-//        int seconds = round(displayOled.drawLastTime / 1000);
-//        displayOled.drawLeftTopTitle("t=" + String(seconds));
-//        displayOled.drawLeftCenterTitle("fps=" + String(round(displayOled.fps)));
         displayOled.drawLeftBottomTitle(String(odo.speedVal));
     }
 
@@ -19,13 +16,15 @@ public:
         if (btn == ItemMenuBase::btnUp) {
             // inc common dist
             odo.setDist(2, distInc(odo.getDist(2), this->dxDistance));
+            odo.toSave();
         } else if (btn == ItemMenuBase::btnDown) {
             // decrement common dist
             odo.setDist(2, distDec(odo.getDist(2), this->dxDistance));
+            odo.toSave();
         } else if (btn == ItemMenuBase::btnCenter) {
             // drop local distance
             odo.setDist(1, 0);
-            odo.saveData();
+            odo.toSave();
         }
     }
 
@@ -49,7 +48,7 @@ public:
 
     virtual void onLeave() {
         odo.enableCalc();
-        if (this->canSave) odo.saveData();
+        if (this->canSave) odo.toSave();
     }
 
     virtual void draw() {
@@ -92,7 +91,7 @@ public:
     }
 
     virtual void onLeave() {
-        if (this->canSave) odo.saveData();
+        if (this->canSave) odo.toSave();
     }
 
     virtual void draw() {
@@ -137,7 +136,7 @@ public:
     }
 
     virtual void onLeave() {
-        if (this->canSave) odo.saveData();
+        if (this->canSave) odo.toSave();
     }
 
     virtual void draw() {
@@ -174,7 +173,7 @@ class ItemInfo : public ItemMenuBase {
 private:
     int pos = 0;
     int dx = 3;
-    String titles[3] = { // max 4
+    String titles[3] = { // max 3!!!
             "Engine",
             "Oil",
             "Gear"
@@ -199,9 +198,8 @@ public:
             (this->pos >= 2) ? (this->pos = 0) : this->pos++;
         } else if (btn == ItemMenuBase::btnCenter) {
             odo.setDist(this->pos + this->dx, 0);
-            odo.saveData();
+            odo.toSave();
         }
     }
 
 };
-

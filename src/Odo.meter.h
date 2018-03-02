@@ -1,9 +1,9 @@
-#include "FM24I2C.h"
+#include <Wire.h>
 
 unsigned long MT_LAT = 10000; //10 ms
 
-FM24I2C fmMaster(0x50);
-FM24I2C fmSlave(0x57);
+int aMaster = 0x50;
+int aSlave = 0x57;
 
 int addr = 0x100;
 int solt = 12345;
@@ -18,19 +18,37 @@ class Odometer {
 private:
     int sensors = 1;
 
-    float rpmTimeProcess = 0;
+    volatile float rpmTimeProcess = 0;
 
     volatile unsigned long timePrev = 0;
     volatile unsigned long timeNext = 0;
     volatile unsigned long timeDXTmp = 0;
     volatile unsigned long timeDXSpeed = 0;
 
-    Dist dat;
+    volatile Dist dat;
     unsigned long prevSaveTime = 0;
     unsigned long saveTime = 0;
     unsigned long checkLen = 0;
+    void pack(int id, int addr, void *data, int len) {
+        Wire.beginTransmission(id);
+        Wire.write((byte * ) & addr, 2);
+        Wire.write((byte *) data, len);
+        Wire.endTransmission(true);
+    }
 
-    // distance counters, need to save this values
+    int unpack(int id, int addr, void *data, int len) {
+        int rc;
+        byte *p;
+        Wire.beginTransmission(id);
+        Wire.write((byte * ) & addr, 2);
+        Wire.endTransmission(false);
+        Wire.requestFrom(id, len);
+        for (rc = 0, p = (byte *) data; Wire.available() && rc < len; rc++, p++) {
+            *p = Wire.read();
+        }
+        return (rc);
+    }
+
 
 public:
 
@@ -45,32 +63,31 @@ public:
     volatile long speedDx = 0;
 
     void readData() {
-        fmMaster.unpack(addr,(void*)&this->dat,sizeof(struct Dist));
-        Serial.println("Read from master; size =" + String(sizeof(this->dat)));
-        this->printDists();
+        this->unpack(aMaster, addr, (void *) &this->dat, sizeof(struct Dist));
+//        Serial.println("Read from master; size =" + String(sizeof(this->dat)));
+//        this->printDists();
         if (this->dat.crc == solt) {
             // all ok
-
         } else {
             // read from slave
-            Serial.println("Read from slave; size=" + String(sizeof(this->dat)));
-            fmSlave.unpack(addr,(void*)&this->dat,sizeof(struct Dist));
+//            Serial.println("Read from slave; size=" + String(sizeof(this->dat)));
+            this->unpack(aSlave, addr, (void *) &this->dat, sizeof(struct Dist));
             if (this->dat.crc != solt) {
                 this->dropData();
             }
-            this->printDists();
+//            this->printDists();
         }
     }
 
-    void printDists() {
-        Serial.println("------------");
-        for (int i = 0; i < 6; i++) {
-            Serial.println(String("pos = ") + String(i) + " val = " + String(this->dat.dist[i]));
-        }
-        Serial.println("circlelen = " + String(this->dat.circleLen));
-        Serial.println("crc = " + String(this->dat.crc));
-        Serial.println("------------");
-    }
+//    void printDists() {
+//        Serial.println("------------");
+//        for (int i = 0; i < 6; i++) {
+//            Serial.println(String("pos = ") + String(i) + " val = " + String(this->dat.dist[i]));
+//        }
+//        Serial.println("circlelen = " + String(this->dat.circleLen));
+//        Serial.println("crc = " + String(this->dat.crc));
+//        Serial.println("------------");
+//    }
 
     void saveData() {
         this->saveTime = millis();
@@ -81,18 +98,16 @@ public:
     }
 
     void saveImmediate() {
-        Serial.println("save! size=" + String(sizeof(Dist)));
         this->dat.crc = solt;
-        this->printDists();
-        fmMaster.pack(addr,(void*)&this->dat,sizeof(struct Dist));
+//        this->printDists();
+        this->pack(aMaster, addr, (void *) &this->dat, sizeof(struct Dist));
         delay(50);
-        fmSlave.pack(addr,(void*)&this->dat,sizeof(struct Dist));
+        this->pack(aSlave, addr, (void *) &this->dat, sizeof(struct Dist));
         this->prevSaveTime = this->saveTime;
         this->canSave = false;
     }
 
     void dropData() {
-        Serial.println("DROP DATA as default");
         for (int i = 0; i < 6; i++) {
             this->dat.dist[i] = 0;
         }
