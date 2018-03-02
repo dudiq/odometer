@@ -13,7 +13,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 
 class DisplayOled {
     volatile int FONT_SIZE = 6;
-    volatile int drawEveryThMs = 200; // in ms
+    volatile int drawEveryThMs = 200; // in ms 200 = 1000 / 4; fps = 4
     volatile unsigned long drawPrevTime = 0;
     volatile unsigned long drawTimeDx = 0;
 
@@ -55,7 +55,7 @@ public:
     volatile unsigned long drawLastTime = 0;
     volatile float fps = 0;
 
-    void setupDisplay(String ver) {
+    void setupDisplay(String ver, int fps) {
         display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x32)
 
         display.clearDisplay();
@@ -65,6 +65,7 @@ public:
         display.println(ver);
         display.display();
         delay(1000);
+        this->drawEveryThMs = round(1000 / fps);
     }
 
     void onDraw( void(*func)(void)) {
@@ -78,17 +79,6 @@ public:
 
         if (this->drawTimeDx > this->drawEveryThMs) {
             display.clearDisplay();
-//            display.setTextColor(WHITE);
-
-//            display.setFont(&FreeMono9pt7b);
-//            this->drawLeftTopTitle("0123");
-//            display.setFont(&FreeMonoBold9pt7b);
-//            this->drawLeftCenterTitle("0123");
-//            display.setFont(&Picopixel);
-//            this->drawLeftbottomTitle("0123");
-//            display.setFont(&Tiny3x3a2pt7b);
-//            this->drawTextAlignLeft("0123", 0, 0, 1);
-
             this->drawCb();
 
             this->fps = 1000 / this->drawTimeDx;
@@ -108,12 +98,10 @@ public:
     }
 
     void drawDistanceMain(String val) {
-//        display.setFont(&FreeMonoBold9pt7b);
         this->drawTextAlignRight(val, 128, 0, 2, true);
     }
 
     void drawDistanceSecond(String val) {
-  //      display.setFont(&FreeMono9pt7b);
         this->drawTextAlignRight(val, 128, 17, 2, true);
     }
 

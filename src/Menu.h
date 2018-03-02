@@ -40,7 +40,11 @@ class MenuOdo {
     float lowDx = 0;
     int holdCounter = 1;
 
-    void (*naviCb) (void);
+    int posItem = 0;
+    int totalItems = 10;
+    ItemMenuBase *menu[10] = {};
+
+//    void (*naviCb) (void);
 
 private:
 
@@ -77,14 +81,29 @@ private:
         return ret;
     }
 
+    void processNavi() {
+        int menuItemPos = this->posItem;
+        this->menu[menuItemPos]->onLeave();
+        menuItemPos++;
+        if (menuItemPos >= this->totalItems) {
+            menuItemPos = 0;
+        }
+        this->posItem = menuItemPos;
+        menu[menuItemPos]->onInit();
+    }
+
 public:
     MenuOdo(int pin);
 
-    void onNavi( void(*func)(void)) {
-        naviCb = func;
+    void initMenuItems(ItemMenuBase *menu[], int total) {
+        for (int i = 0; i < total; i++) {
+            this->menu[i] = menu[i];
+        }
+        this->totalItems = total;
     }
 
-    void onItemMenu(ItemMenuBase *currItem) {
+    void onItemMenu() {
+        ItemMenuBase *currItem = this->menu[this->posItem];
         int btn = this->getBtn();
 
         if (btn != ItemMenuBase::btnNone) {
@@ -99,7 +118,7 @@ public:
                 if (this->btnPressed && (this->btnHoldTimeDx > this->holdTimeValue)) {
                     // hold press
                     if (btn == ItemMenuBase::btnCenter) {
-                        this->naviCb();
+                        this->processNavi();
                         this->btnPressed = false;
                     } else {
                         this->processHoldClicks(btn, currItem);
@@ -118,6 +137,10 @@ public:
                 this->btnHoldTimeStart = 0;
             }
         }
+    }
+
+    void drawCurrentItem(){
+        this->menu[this->posItem]->draw();
     }
 
 };
