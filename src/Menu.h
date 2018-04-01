@@ -1,33 +1,13 @@
 #include "ItemMenuBase.h"
 
 int HOLD_COUNT_MAX = 10;
-
-// axises
-int range = 12;               // output range of X or Y movement
-int threshold = range / 4;    // resting threshold
-int center = range / 2;       // resting position value
-int readAxis(int thisAxis) {
-    // read the analog input:
-    int reading = analogRead(thisAxis);
-
-    // map the reading from the analog input range to the output range:
-    reading = map(reading, 0, 1023, 0, range);
-
-    // if the output reading is outside from the rest position threshold, use it:
-    int distance = reading - center;
-
-    if (abs(distance) < threshold) {
-        distance = 0;
-    }
-
-    // return the distance for this axis:
-    return distance;
-}
+int btnData;
+int btnResult;
+int menuItemPos;
 
 class MenuOdo {
-    int pinBtnCenter = 10;
-
     int lastBtn = ItemMenuBase::btnNone;
+    int pinRead;
 
     unsigned long btnHoldTimeStart = 0;
     unsigned long btnHoldTimeDx = 0;
@@ -44,7 +24,7 @@ class MenuOdo {
     int totalItems = 10;
     ItemMenuBase *menu[10] = {};
 
-//    void (*naviCb) (void);
+    void (*onChangedCb)(void);
 
 private:
 
@@ -53,7 +33,8 @@ private:
             // low speed
             this->now = millis();
 
-            this->lowDx = this->lowTimeValue * (this->holdCounter * ((HOLD_COUNT_MAX - this->holdCounter) * 10 / HOLD_COUNT_MAX)) / 10;
+            this->lowDx = this->lowTimeValue *
+                          (this->holdCounter * ((HOLD_COUNT_MAX - this->holdCounter) * 10 / HOLD_COUNT_MAX)) / 10;
             this->lowSpeedTime = this->btnHoldTimeStart + this->holdTimeValue;
             this->lowSpeedTime += this->lowDx;
 
@@ -66,34 +47,53 @@ private:
             currItem->onKeyHold(btn);
         }
     }
-    
+
     int getBtn() {
-        int ret = ItemMenuBase::btnNone;
+        btnResult = ItemMenuBase::btnNone;
+        btnData = analogRead(pinRead);
+        //Serial.println("--| " + String(btnData));
 
-        (digitalRead(this->pinBtnCenter) != HIGH) && (ret = ItemMenuBase::btnCenter);
+        // btn results from analog read
+        // 72
+        // 123
+        // 169
+        // 210
 
-        int xReading = readAxis(A0);
-        int yReading = readAxis(A1);
+        if (btnData > 50 && btnData < 100) {
+            btnResult = ItemMenuBase::btnUp;
+        } else if (btnData > 100 && btnData < 140) {
+            btnResult = ItemMenuBase::btnCenter;
+        } else if (btnData > 140 && btnData < 185) {
+            btnResult = ItemMenuBase::btnDown;
+        } else if (btnData > 185 && btnData < 230) {
+            btnResult = ItemMenuBase::btnMenu;
+        }
 
-        (xReading > 0 || yReading > 0) && (ret = ItemMenuBase::btnUp);
-        (xReading < 0 || yReading < 0) && (ret = ItemMenuBase::btnDown);
-
-        return ret;
+        return btnResult;
     }
 
     void processNavi() {
-        int menuItemPos = this->posItem;
+        menuItemPos = this->posItem;
         this->menu[menuItemPos]->onLeave();
         menuItemPos++;
         if (menuItemPos >= this->totalItems) {
             menuItemPos = 0;
         }
         this->posItem = menuItemPos;
+        this->onChangedCb();
         menu[menuItemPos]->onInit();
     }
 
 public:
     MenuOdo(int pin);
+
+    void initButton() {
+        pinMode(this->pinRead, INPUT_PULLUP);
+    }
+
+    void onChanged(void(*func)(void)) {
+        onChangedCb = func;
+    }
 
     void initMenuItems(ItemMenuBase *menu[], int total) {
         for (int i = 0; i < total; i++) {
@@ -110,9 +110,14 @@ public:
             if (this->btnHoldTimeStart == 0) {
                 this->btnHoldTimeStart = millis();
                 // button pressed
-                currItem->onKeyDown(btn);
                 this->lastBtn = btn;
                 this->btnPressed = true;
+                if (btn == ItemMenuBase::btnMenu) {
+                    // use navi
+                    this->processNavi();
+                } else {
+                    currItem->onKeyDown(btn);
+                }
             } else {
                 this->btnHoldTimeDx = getTimeDiff(millis(), btnHoldTimeStart);
                 if (this->btnPressed && (this->btnHoldTimeDx > this->holdTimeValue)) {
@@ -139,12 +144,12 @@ public:
         }
     }
 
-    void drawCurrentItem(){
+    void drawCurrentItem() {
         this->menu[this->posItem]->draw();
     }
 
 };
 
 MenuOdo::MenuOdo(int pin) {
-    pinBtnCenter = pin;
+    this->pinRead = pin;
 }

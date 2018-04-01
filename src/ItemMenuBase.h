@@ -5,6 +5,7 @@ public:
     static const int btnUp = 1;
     static const int btnDown = 2;
     static const int btnCenter = 3;
+    static const int btnMenu = 4;
 
     inline virtual void draw();
     inline virtual void onKeyDown(int &);

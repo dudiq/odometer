@@ -9,7 +9,14 @@ int addr = 0x100;
 int solt = 12345;
 
 struct Dist {
-    volatile unsigned long dist[6] = {0, 0, 0, 0, 0, 0};
+    volatile unsigned long dist[6] = {
+            0, // linked with circle len, for calculate correct distance
+            0, // current distance
+            0, // local distance
+            0, // item info (Engine)
+            0, // item info (Oil)
+            0  // item info (Gear)
+    };
     volatile int circleLen = 0;
     int crc = 0;
 };
@@ -52,7 +59,7 @@ private:
 
 public:
 
-    String version = "Odo.meter v 0.0.4";
+    String version = "Odo.meter v 0.0.5";
     volatile boolean canSave = false;
     volatile boolean isCalc = true;
     volatile unsigned long timeDX = 0;
@@ -79,15 +86,15 @@ public:
         }
     }
 
-//    void printDists() {
-//        Serial.println("------------");
-//        for (int i = 0; i < 6; i++) {
-//            Serial.println(String("pos = ") + String(i) + " val = " + String(this->dat.dist[i]));
-//        }
-//        Serial.println("circlelen = " + String(this->dat.circleLen));
-//        Serial.println("crc = " + String(this->dat.crc));
-//        Serial.println("------------");
-//    }
+    void printDists() {
+        Serial.println("------------");
+        for (int i = 0; i < 6; i++) {
+            Serial.println(String("pos = ") + String(i) + " val = " + String(this->dat.dist[i]));
+        }
+        Serial.println("circlelen = " + String(this->dat.circleLen));
+        Serial.println("crc = " + String(this->dat.crc));
+        Serial.println("------------");
+    }
 
     void saveData() {
         this->saveTime = millis();
