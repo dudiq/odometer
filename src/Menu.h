@@ -112,12 +112,7 @@ public:
                 // button pressed
                 this->lastBtn = btn;
                 this->btnPressed = true;
-                if (btn == ItemMenuBase::btnMenu) {
-                    // use navi
-                    this->processNavi();
-                } else {
-                    currItem->onKeyDown(btn);
-                }
+                currItem->onKeyDown(btn);
             } else {
                 this->btnHoldTimeDx = getTimeDiff(millis(), btnHoldTimeStart);
                 if (this->btnPressed && (this->btnHoldTimeDx > this->holdTimeValue)) {
@@ -135,7 +130,12 @@ public:
                 if (this->btnHoldTimeDx <= this->holdTimeValue) {
                     // release
                     // if hold processed, onUp NOT call
-                    currItem->onKeyUp(lastBtn);
+                    if (lastBtn == ItemMenuBase::btnMenu) {
+                        // use navi
+                        this->processNavi();
+                    } else {
+                        currItem->onKeyUp(lastBtn);
+                    }
                 }
                 this->holdCounter = 1;
                 this->btnHoldTimeDx = 0;
