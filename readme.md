@@ -1,10 +1,9 @@
-
 Arduino odometer
 =
 
-This is simple project for write own odometer for enduro motorcycle with hall sensor and ssd1306 i2c display screen (128x32)
+This is simple project for write own odometer for enduro motorcycle with hall sensor and ssd1306 i2c display screen (128x64)
 
-> Screens are switching by long hold of center button (500ms+)
+> Screens are switching by long hold of center button (500ms+) or click to "menu" button
 
 ## Screens
 
@@ -36,13 +35,13 @@ Shows info about `Engine`, `Oil`, `Gear` counter.
 
 ### Equipment:
 
-- Arduino nano (atmega328p)
+- Arduino (i'm using nano, atmega328p)
 - Hall sensor (ky003)
-- I2C display based on ssd1306 chip (0.91` 128x32 I2C OLED)
+- I2C display based on ssd1306 chip (0.91` 128x64 I2C OLED)
 - Fram FM24CL16
 - wires
-- 3 buttons
-- 3 resistor (10kOm)
+- 4 buttons
+- 4 resistor (2.2kOm)
 - and any type of power for arduino only
 
 MIT idudiq 2018
