@@ -13,6 +13,7 @@ DisplayOled displayOled;
 Odometer odo;
 
 
+
 MenuOdo menuOdo(PIN_BTN);
 
 int cnt = 0;
@@ -79,4 +80,3 @@ void drawMenuItem() {
 void onMenuItemChanged() {
     displayOled.clearDisplay();
 }
-

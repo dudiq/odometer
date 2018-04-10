@@ -54,10 +54,10 @@ private:
         //Serial.println("--| " + String(btnData));
 
         // btn results from analog read
-        // 72
-        // 123
-        // 169
-        // 210
+        // 72 - up
+        // 123 - center
+        // 169 - down
+        // 210 - menu
 
         if (btnData > 50 && btnData < 100) {
             btnResult = ItemMenuBase::btnUp;

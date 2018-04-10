@@ -10,7 +10,8 @@ void setupMenuItems() {
             displayOled.drawDistanceSecond(odo.getDist(2));
 
             // left elements
-            displayOled.drawTitle(String(odo.speedVal) + " km/h");
+            displayOled.drawTitle(String("#"));
+            //displayOled.drawTitle(String(odo.speedVal) + " km/h");
         }
 
         virtual void onKeyUp(int &btn) {
@@ -175,9 +176,9 @@ void setupMenuItems() {
         int pos = 0;
         int dx = 3;
         String titles[3] = { // max 3!!!
-                "Engine  ",
-                "  Oil   ",
-                "    Gear"
+                "Engine    ",
+                "   Oil    ",
+                "      Gear"
         };
     public:
 
